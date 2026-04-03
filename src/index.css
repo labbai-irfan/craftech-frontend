@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply font-poppins text-dark bg-white overflow-x-hidden;
+    line-height: 1.7;
+    cursor: none;
+  }
+}
+
+/* Custom Base Styles from Original CSS */
+.text-gradient {
+  background: linear-gradient(135deg, #0A2647 0%, #C41B1F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 3D Tilt Card Base classes */
+.tilt-card {
+  @apply transition-all duration-500;
+  transform-style: preserve-3d;
+}
+
+/* --- Noise / Film Grain --- */
+.noise-grain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9995;
+  opacity: 0.038;
+  mix-blend-mode: overlay;
+}
+
+/* Custom AOS Overrides */
+[data-aos="fade-up"] {
+  transform: translateY(30px);
+  opacity: 0;
+  transition-property: transform, opacity;
+}
+[data-aos="fade-up"].aos-animate {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Hero word-mask animations */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  margin-right: 0.22em;
+}
+.word-mask > span {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+}
+.word-mask.revealed > span {
+  animation: wordSlideUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes wordSlideUp {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Hide cursor on mobile */
+@media (max-width: 1024px) {
+  body { cursor: auto; }
+}
