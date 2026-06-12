@@ -1,48 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const videoData = [
-  {
-    id: 1,
-    title: 'DB Bhavan: The Transformation',
-    category: 'Structural Evolution • 2:14 min',
-    tag: 'Structural Architecture',
-    poster: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114625/25_mtkmve.jpg',
-    videos: [
-      { url: "https://res.cloudinary.com/dcx2gs6mm/video/upload/v1775114892/5_egkl3u.mp4", label: "Main Structural Phase" },
-      { url: "https://res.cloudinary.com/dcx2gs6mm/video/upload/v1775114661/2_xos11l.mp4", label: "Column Casting" }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Ramzan Shaikh Site Execution',
-    category: 'High-Quality Recap • 1:45 min',
-    tag: 'Execution Precision',
-    poster: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114621/7_aknzm4.jpg',
-    videos: [
-      { url: "https://res.cloudinary.com/dcx2gs6mm/video/upload/v1775114678/1_stwtt6.mp4", label: "Execution Overview" }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Dr. Waqar Ansari Interiors',
-    category: 'Luxury Walkthrough • 3:20 min',
-    tag: 'Final Handover',
-    poster: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114383/20_inghex.jpg',
-    videos: [
-      { url: "https://res.cloudinary.com/dcx2gs6mm/video/upload/v1775114522/6_vmxy2l.mp4", label: "Interior Reveal" }
-    ]
-  }
-];
+import { contentApi } from '../../services/api';
 
 const Videos = () => {
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
 
-  const handleOpenGroup = (item) => {
-    setSelectedGroup(item);
-    setActiveVideo(item.videos[0]);
-  };
+  useEffect(() => {
+    contentApi.getHighlightVideos()
+      .then(({ data }) => {
+        if (data.success) {
+          // Group videos by category
+          const grouped = Object.values(
+            data.data.reduce((acc, v) => {
+              const cat = v.category || 'Other';
+              if (!acc[cat]) {
+                acc[cat] = {
+                  id: v._id,
+                  title: cat,
+                  category: cat,
+                  tag: v.category,
+                  poster: v.thumbnailUrl || 'https://via.placeholder.com/800x450?text=Video',
+                  videos: []
+                };
+              }
+              acc[cat].videos.push({ url: v.url, label: v.title });
+              return acc;
+            }, {})
+          );
+          setVideos(grouped);
+        }
+      })
+      .catch(err => console.error('Failed to load videos:', err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || !videos.length) return null;
+
 
   return (
     <section id="videos" className="py-24 bg-white relative overflow-hidden">
@@ -52,9 +48,9 @@ const Videos = () => {
            <div className="max-w-2xl">
               <div className="flex items-center gap-4 mb-8">
                 <span className="w-12 h-[2px] bg-accent" />
-                <span className="text-[0.75rem] font-black uppercase tracking-[5px] text-blue/40">In Motion</span>
+                <span className="text-[0.75rem] font-black uppercase tracking-[5px] text-navy/40">In Motion</span>
               </div>
-              <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black text-blue leading-[1.1] tracking-tighter">
+              <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black text-navy leading-[1.1] tracking-tighter">
                 Visualizing <br /> <span className="text-accent italic font-black">Execution.</span>
               </h2>
            </div>
@@ -64,14 +60,14 @@ const Videos = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {videoData.map((item, i) => (
-            <motion.div 
-              key={item.id} 
+          {videos.map((item, i) => (
+            <motion.div
+              key={item.id}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: i * 0.1 }}
               viewport={{ once: true }}
-              onClick={() => handleOpenGroup(item)}
+              onClick={() => { setSelectedGroup(item); setActiveVideo(item.videos[0]); }}
               className="group cursor-none"
             >
               <div className="relative rounded-[40px] overflow-hidden mb-8 aspect-video shadow-2xl group-hover:scale-105 transition-transform duration-700 bg-light">
@@ -91,10 +87,10 @@ const Videos = () => {
               </div>
               <div className="px-6 flex justify-between items-center group">
                 <div className="flex flex-col">
-                  <h4 className="text-2xl font-black text-blue mb-2 transition-colors group-hover:text-accent">{item.title}</h4>
+                  <h4 className="text-2xl font-black text-navy mb-2 transition-colors group-hover:text-accent">{item.title}</h4>
                   <span className="text-[0.8rem] text-mid font-black uppercase tracking-[3px] leading-none">{item.category}</span>
                 </div>
-                <div className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center text-blue group-hover:bg-blue group-hover:text-white transition-all duration-500">
+                <div className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center text-navy group-hover:bg-navy group-hover:text-white transition-all duration-500">
                   <i className="fa-solid fa-arrow-right-long" />
                 </div>
               </div>
@@ -115,12 +111,12 @@ const Videos = () => {
                 <div className="flex items-center gap-8">
                    <button 
                       onClick={() => { setSelectedGroup(null); setActiveVideo(null); }}
-                      className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-blue hover:bg-accent hover:border-accent hover:text-white transition-all cursor-none"
+                      className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-navy hover:bg-accent hover:border-accent hover:text-white transition-all cursor-none"
                    >
                       <i className="fa-solid fa-xmark text-xl" />
                    </button>
                    <div className="flex flex-col">
-                      <h3 className="text-xl font-black text-blue leading-none mb-1">{selectedGroup.title}</h3>
+                      <h3 className="text-xl font-black text-navy leading-none mb-1">{selectedGroup.title}</h3>
                       <span className="text-[0.6rem] font-black text-mid uppercase tracking-[4px]">{selectedGroup.tag}</span>
                    </div>
                 </div>
@@ -128,24 +124,24 @@ const Videos = () => {
 
              <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                 <div className="flex-[2] bg-gray-50 flex items-center justify-center p-4 lg:p-12 relative overflow-hidden group">
-                   <motion.div 
+                   <motion.div
                      key={activeVideo.url}
                      initial={{ opacity: 0, scale: 0.95 }}
                      animate={{ opacity: 1, scale: 1 }}
                      className="w-full relative rounded-3xl overflow-hidden shadow-2xl aspect-video border border-gray-100"
                    >
-                      <video src={activeVideo.url} controls autoPlay className="w-full h-full object-contain bg-black" />
+                      <video src={activeVideo.url} controls autoPlay preload="none" className="w-full h-full object-contain bg-black" />
                    </motion.div>
                 </div>
                 <div className="flex-1 bg-white border-l border-gray-100 p-8 lg:p-12 overflow-y-auto">
                    <div className="flex items-center gap-4 mb-10">
                       <div className="w-8 h-[1px] bg-accent" />
-                      <span className="text-[0.7rem] font-black text-blue uppercase tracking-[5px]">Project Segments</span>
+                      <span className="text-[0.7rem] font-black text-navy uppercase tracking-[5px]">Project Segments</span>
                    </div>
                    <div className="grid grid-cols-1 gap-6">
                       {selectedGroup.videos.map((vid, i) => (
-                        <button key={i} onClick={() => setActiveVideo(vid)} className={`group flex items-center gap-6 p-6 rounded-3xl transition-all duration-500 text-left border cursor-none ${activeVideo.url === vid.url ? 'bg-blue border-blue text-white shadow-xl' : 'bg-light border-gray-100 hover:bg-gray-100 text-blue'}`}>
-                           <div className={`w-14 h-14 rounded-2xl flex flex-shrink-0 items-center justify-center ${activeVideo.url === vid.url ? 'bg-white/20 text-white' : 'bg-blue/5 text-blue/40'}`}>
+                        <button key={i} onClick={() => setActiveVideo(vid)} className={`group flex items-center gap-6 p-6 rounded-3xl transition-all duration-500 text-left border cursor-none ${activeVideo.url === vid.url ? 'bg-navy border-navy text-white shadow-xl' : 'bg-light border-gray-100 hover:bg-gray-100 text-navy'}`}>
+                           <div className={`w-14 h-14 rounded-2xl flex flex-shrink-0 items-center justify-center ${activeVideo.url === vid.url ? 'bg-white/20 text-white' : 'bg-navy/5 text-navy/40'}`}>
                               <i className="fa-solid fa-play text-xs" />
                            </div>
                            <h4 className="text-base font-black uppercase tracking-tight">{vid.label}</h4>

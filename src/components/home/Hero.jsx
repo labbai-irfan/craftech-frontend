@@ -1,29 +1,27 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMousePosition, lerp } from '../../hooks/useMousePosition';
+import { useCMS } from '../../context/CMSContext';
+import { copy } from '../../content/copy';
 
-const slidesData = [
+const DEFAULT_SLIDES = [
   {
     image: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114390/31_j0lbxw.jpg',
     pos: 'center 40%',
-    title: 'Building Legacy,',
-    subtitle: 'High-rise construction redefined.',
+    title: 'Building Legacy, Engineering Trust.',
+    subtitle: 'Professional partner for turn-key construction and specialized MEP systems across Mumbai.',
   },
   {
     image: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114387/19_ibvdfz.jpg',
     pos: 'center center',
-    title: 'Future Engineering.',
-    subtitle: 'Bliss Tower — iconic architecture.',
-  },
-  {
-    image: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114382/33_qzs6fu.jpg',
-    pos: 'center 30%',
-    title: 'Bespoke Interiors.',
-    subtitle: 'Luxury bespoke living solutions.',
+    title: 'Future Engineering, Iconic Architecture.',
+    subtitle: 'Bliss Tower — redefining the urban skyline through technical mastery.',
   },
 ];
 
 const Hero = () => {
+  const { homeData } = useCMS();
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [current, setCurrent] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const { x, y } = useMousePosition();
@@ -32,12 +30,18 @@ const Hero = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    if (homeData?.heroSlides?.length > 0) {
+      setSlides(homeData.heroSlides);
+    }
+  }, [homeData]);
+
+  useEffect(() => {
     const timer = setTimeout(() => setIsRevealed(true), 1200);
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slidesData.length);
+      setCurrent((prev) => (prev + 1) % slides.length);
     }, 8000);
     return () => { clearTimeout(timer); clearInterval(interval); };
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
     const animate = () => {
@@ -74,10 +78,9 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="hero" className="relative h-screen min-h-[600px] flex items-center overflow-hidden bg-blue-dark">
+    <section id="hero" className="relative h-screen min-h-[600px] flex items-center overflow-hidden bg-navy-dark">
       <canvas ref={canvasRef} className="absolute inset-0 z-[2] opacity-30 pointer-events-none" />
 
-      {/* Hero Background Layers */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
           <motion.div
@@ -87,10 +90,10 @@ const Hero = () => {
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 2 }}
             className="absolute inset-0 bg-cover bg-no-repeat transition-all duration-1000"
-            style={{ backgroundImage: `url(${slidesData[current].image})`, backgroundPosition: slidesData[current].pos }}
+            style={{ backgroundImage: `url(${slides[current]?.image})`, backgroundPosition: slides[current]?.pos || 'center center' }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-dark/95 via-blue-dark/40 to-transparent lg:from-blue-dark/80" />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-dark/90 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/95 via-navy-dark/40 to-transparent lg:from-navy-dark/80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/90 via-transparent to-transparent" />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -107,15 +110,20 @@ const Hero = () => {
 
           <h1 className="text-[clamp(2.5rem,8vw,5.5rem)] font-black text-white leading-[1.05] tracking-tighter mb-10">
              <div className="overflow-hidden pb-1">
-                <motion.span initial={{ y: '100%' }} animate={isRevealed ? { y: 0 } : {}} transition={{ delay: 0.5, duration: 1.2, ease: [0.16,1,0.3,1] }} className="inline-block">Building Legacy,</motion.span>
+                <motion.span key={`t1-${current}`} initial={{ y: '100%' }} animate={isRevealed ? { y: 0 } : {}} transition={{ delay: 0.5, duration: 1.2, ease: [0.16,1,0.3,1] }} className="inline-block">
+                  {slides[current]?.title?.split(',')[0]}
+                  {slides[current]?.title?.includes(',') ? ',' : ''}
+                </motion.span>
              </div>
              <div className="overflow-hidden -mt-2 lg:-mt-4">
-                <motion.span initial={{ y: '100%' }} animate={isRevealed ? { y: 0 } : {}} transition={{ delay: 0.7, duration: 1.2, ease: [0.16,1,0.3,1] }} className="inline-block text-accent italic font-black">Engineering Trust.</motion.span>
+                <motion.span key={`t2-${current}`} initial={{ y: '100%' }} animate={isRevealed ? { y: 0 } : {}} transition={{ delay: 0.7, duration: 1.2, ease: [0.16,1,0.3,1] }} className="inline-block text-accent italic font-black">
+                  {slides[current]?.title?.split(',')[1] || ''}
+                </motion.span>
              </div>
           </h1>
 
-          <motion.p initial={{ opacity:0, y:20 }} animate={isRevealed ? { opacity:1, y:0 } : {}} transition={{ delay: 1 }} className="text-[1.1rem] lg:text-[1.3rem] text-white/70 font-medium mb-12 max-w-[650px] mx-auto lg:mx-0 leading-relaxed">
-            Professional partner for turn-key construction, specialized MEP systems, and premium fit-outs across Mumbai's urban landscapes.
+          <motion.p key={`p-${current}`} initial={{ opacity:0, y:20 }} animate={isRevealed ? { opacity:1, y:0 } : {}} transition={{ delay: 1 }} className="text-[1.1rem] lg:text-[1.3rem] text-white/70 font-medium mb-12 max-w-[650px] mx-auto lg:mx-0 leading-relaxed">
+            {slides[current]?.subtitle}
           </motion.p>
 
           <motion.div initial={{ opacity:0, y:20 }} animate={isRevealed ? { opacity:1, y:0 } : {}} transition={{ delay: 1.2 }} className="flex flex-col sm:flex-row items-center justify-start gap-8">
@@ -126,13 +134,13 @@ const Hero = () => {
                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all">
                   <i className="fa-solid fa-paper-plane text-xs" />
                </div>
-               <span className="text-[0.8rem] font-black uppercase tracking-widest">Connect with Leads</span>
+               <span className="text-[0.8rem] font-black uppercase tracking-widest">{copy.hero.primaryCTA}</span>
             </a>
           </motion.div>
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-16 border-t border-white/5 bg-blue-dark/50 backdrop-blur-md z-20 flex items-center overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-16 border-t border-white/5 bg-navy-dark/50 backdrop-blur-md z-20 flex items-center overflow-hidden">
         <div className="animate-marquee flex whitespace-nowrap text-[0.6rem] font-bold text-white/20 uppercase tracking-[4px]">
           {[...Array(5)].map((_, i) => (
             <span key={i} className="mx-8">• ISO 9001:2015 Structural Excellence • Precision MEP Integration • Mumbai Leading Fit-Out Partner • 12+ Years Industry Legacy • </span>

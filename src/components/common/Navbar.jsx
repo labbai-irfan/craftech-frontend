@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCMS } from '../../context/CMSContext';
 
 const Navbar = () => {
+  const { settings } = useCMS();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -76,7 +78,7 @@ const Navbar = () => {
                 key={link.title}
                 href={link.href}
                 className={`text-[0.75rem] font-bold uppercase tracking-[3px] py-2 relative group transition-colors duration-300 ${
-                  isScrolled ? 'text-blue' : 'text-white/80 hover:text-white'
+                  isScrolled ? 'text-navy' : 'text-white/80 hover:text-white'
                 }`}
               >
                 {link.title}
@@ -90,8 +92,8 @@ const Navbar = () => {
               href="#contact"
               className={`px-8 py-4 rounded-xl text-[0.7rem] font-black uppercase tracking-[3px] transition-all duration-500 ${
                 isScrolled 
-                ? 'bg-blue text-white shadow-xl hover:shadow-blue/20 hover:-translate-y-1' 
-                : 'bg-white text-blue hover:bg-accent hover:text-white'
+                ? 'bg-navy text-white shadow-xl hover:shadow-navy/20 hover:-translate-y-1' 
+                : 'bg-white text-navy hover:bg-accent hover:text-white'
               }`}
             >
               Get Technical Quote
@@ -103,8 +105,8 @@ const Navbar = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="xl:hidden relative z-[5001] w-12 h-12 flex flex-col items-center justify-center gap-2 group"
           >
-            <span className={`w-8 h-[2px] transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-blue' : 'bg-white'} ${isMobileMenuOpen ? 'rotate-45 translate-y-[5px]' : ''}`} />
-            <span className={`w-8 h-[2px] transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-blue' : 'bg-white'} ${isMobileMenuOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
+            <span className={`w-8 h-[2px] transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-navy' : 'bg-white'} ${isMobileMenuOpen ? 'rotate-45 translate-y-[5px]' : ''}`} />
+            <span className={`w-8 h-[2px] transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-navy' : 'bg-white'} ${isMobileMenuOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
           </button>
         </div>
       </header>
@@ -118,7 +120,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-blue-dark/60 backdrop-blur-md z-[4998]"
+              className="fixed inset-0 bg-navy-dark/60 backdrop-blur-md z-[4998]"
             />
             <motion.nav
               variants={menuVariants}
@@ -134,7 +136,7 @@ const Navbar = () => {
                     variants={linkVariants}
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-4xl lg:text-5xl font-black text-blue hover:text-accent transition-colors duration-300 tracking-tighter"
+                    className="text-4xl lg:text-5xl font-black text-navy hover:text-accent transition-colors duration-300 tracking-tighter"
                   >
                     {link.title}
                   </motion.a>
@@ -145,12 +147,12 @@ const Navbar = () => {
                 <motion.div variants={linkVariants} className="flex flex-col gap-6">
                   <div className="flex flex-col">
                     <span className="text-[0.6rem] font-black text-mid uppercase tracking-[4px] mb-2">Direct Contact</span>
-                    <a href="tel:+919324877493" className="text-xl font-black text-blue">+91 93248 77493</a>
+                    <a href={`tel:${settings?.phone || '+919324877493'}`} className="text-xl font-black text-navy">{settings?.phone || '+91 93248 77493'}</a>
                   </div>
                   <a 
                     href="#contact" 
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full py-6 bg-blue text-white rounded-3xl text-center font-black uppercase tracking-[3px] text-sm"
+                    className="w-full py-6 bg-navy text-white rounded-3xl text-center font-black uppercase tracking-[3px] text-sm"
                   >
                     Start a Project
                   </a>

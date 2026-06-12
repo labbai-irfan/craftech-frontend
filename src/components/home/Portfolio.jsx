@@ -1,59 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const projects = [
-  {
-    id: 1,
-    title: 'Ramzan Shaikh Complex',
-    category: 'construction',
-    displayCategory: 'Structural Evolution',
-    client: 'Ramzan Shaikh',
-    year: '2023',
-    location: 'Mumbai, MH',
-    thumbnail: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114621/39_vjll9h.jpg',
-    images: [
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114653/5_x1eeoa.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114651/10_vglwnb.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114649/1.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114390/31_j0lbxw.jpg",
-    ]
-  },
-  {
-    id: 2,
-    title: 'Waqar Ansari Residence',
-    category: 'interiors',
-    displayCategory: 'Luxury Fit-Out',
-    client: 'Dr. Waqar Ansari',
-    year: '2024',
-    location: 'Juhu, Mumbai',
-    thumbnail: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114377/39_s4jqut.jpg',
-    images: [
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114653/5_x1eeoa.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114631/42_inv6rf.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114630/38_rqrnse.jpg",
-    ]
-  },
-  {
-    id: 3,
-    title: 'DB Bhavan — Corporate Hub',
-    category: 'building',
-    displayCategory: 'Architecture & MEP',
-    client: 'DB Group',
-    year: '2023',
-    location: 'Andheri, Mumbai',
-    thumbnail: 'https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114625/25_mtkmve.jpg',
-    images: [
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114625/25_mtkmve.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114624/22_grmb1j.jpg",
-      "https://res.cloudinary.com/dcx2gs6mm/image/upload/v1775114639/18_ykacjn.jpg",
-    ]
-  }
-];
+import { Link } from 'react-router-dom';
+import { projectsApi } from '../../services/api';
 
 const Portfolio = () => {
+  const [projects, setProjects] = useState([]);
   const [filter, setFilter] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data } = await projectsApi.getAll();
+        if (data.success) setProjects(data.data);
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const categories = ['all', 'Structural Evolution', 'Luxury Fit-Out', 'Architecture & MEP', 'Building Construction'];
+  
   const filteredProjects = projects.filter(p => filter === 'all' || p.category === filter);
 
   return (
@@ -65,9 +36,9 @@ const Portfolio = () => {
            <div className="max-w-2xl">
               <div className="flex items-center gap-4 mb-6">
                  <span className="w-12 h-[2px] bg-accent" />
-                 <span className="text-[0.7rem] font-black uppercase tracking-[5px] text-blue/40">Our Work</span>
+                 <span className="text-[0.7rem] font-black uppercase tracking-[5px] text-navy/40">Our Work</span>
               </div>
-              <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black text-blue leading-[1.1] tracking-tighter">
+              <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black text-navy leading-[1.1] tracking-tighter">
                 Engineering <br /> <span className="text-accent italic font-black">Distinction.</span>
               </h2>
            </div>
@@ -78,12 +49,12 @@ const Portfolio = () => {
 
         {/* Filter Navigation */}
         <div className="flex gap-4 mb-16 overflow-x-auto pb-4 scrollbar-hide no-scrollbar" data-aos="fade-up">
-          {['all', 'building', 'interiors', 'construction'].map(f => (
+          {categories.map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`whitespace-nowrap px-10 py-5 rounded-full text-[0.8rem] font-black uppercase tracking-[2px] transition-all duration-500 cursor-none ${
-                filter === f ? 'bg-blue text-white shadow-2xl scale-105' : 'bg-light text-mid border-2 border-transparent hover:bg-gray-100'
+                filter === f ? 'bg-navy text-white shadow-2xl scale-105' : 'bg-light text-mid border-2 border-transparent hover:bg-gray-100'
               }`}
             >
               {f === 'all' ? 'Featured Collection' : f}
@@ -95,15 +66,17 @@ const Portfolio = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, i) => (
+              <Link
+                key={project._id}
+                to={`/case-study/${project._id}`}
+                className="group relative rounded-[40px] overflow-hidden shadow-2xl cursor-pointer transition-all duration-500 hover-lift"
+              >
               <motion.div
-                key={project.id}
                 layout
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => setSelectedProject(project)}
-                className="group relative rounded-[40px] overflow-hidden shadow-2xl cursor-none transition-all duration-500"
               >
                 <div className="aspect-[4/5] overflow-hidden group-hover:scale-105 transition-transform duration-1000">
                   <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
@@ -113,7 +86,7 @@ const Portfolio = () => {
                 <div className="absolute inset-x-8 bottom-8 p-10 bg-white/5 backdrop-blur-3xl border border-white/20 rounded-[32px] opacity-0 group-hover:opacity-100 translate-y-10 group-hover:translate-y-0 transition-all duration-500 shadow-2xl">
                    <div className="flex justify-between items-start mb-6">
                       <div className="flex flex-col">
-                        <span className="text-[0.6rem] font-black uppercase tracking-[3px] text-white/50 mb-2">{project.displayCategory}</span>
+                        <span className="text-[0.6rem] font-black uppercase tracking-[3px] text-white/50 mb-2">{project.category}</span>
                         <h4 className="text-2xl font-black text-white leading-none">{project.title}</h4>
                       </div>
                       <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white">
@@ -122,6 +95,7 @@ const Portfolio = () => {
                    </div>
                 </div>
               </motion.div>
+              </Link>
             ))}
           </AnimatePresence>
         </div>
@@ -140,24 +114,24 @@ const Portfolio = () => {
              <div className="flex flex-col lg:flex-row min-h-screen">
                 <div className="lg:w-[400px] xl:w-[450px] lg:h-screen lg:fixed lg:left-0 bg-light p-10 md:p-16 lg:p-20 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-gray-100">
                    <div className="z-10">
-                      <button onClick={() => setSelectedProject(null)} className="mb-10 lg:mb-16 flex items-center gap-4 text-blue font-black uppercase text-[0.65rem] tracking-[4px] group transition-colors cursor-none">
+                      <button onClick={() => setSelectedProject(null)} className="mb-10 lg:mb-16 flex items-center gap-4 text-navy font-black uppercase text-[0.65rem] tracking-[4px] group transition-colors cursor-none">
                          <i className="fa-solid fa-arrow-left transition-transform group-hover:-translate-x-2" /> Back to Gallery
                       </button>
-                      <span className="text-[0.6rem] font-black uppercase tracking-[5px] text-accent mb-4 lg:mb-6 block">{selectedProject.displayCategory}</span>
-                      <h2 className="text-4xl lg:text-5xl font-black text-blue leading-tight mb-8 lg:mb-10">{selectedProject.title}</h2>
-                      <div className="h-[4px] w-12 bg-blue mb-8 lg:mb-10" />
+                      <span className="text-[0.6rem] font-black uppercase tracking-[5px] text-accent mb-4 lg:mb-6 block">{selectedProject.category}</span>
+                      <h2 className="text-4xl lg:text-5xl font-black text-navy leading-tight mb-8 lg:mb-10">{selectedProject.title}</h2>
+                      <div className="h-[4px] w-12 bg-navy mb-8 lg:mb-10" />
                       <div className="grid grid-cols-2 lg:grid-cols-1 gap-8">
                          <div className="flex flex-col">
                             <span className="text-[0.55rem] font-bold text-mid uppercase tracking-[3px] mb-2">Location</span>
-                            <span className="text-blue font-black text-sm lg:text-lg">{selectedProject.location}</span>
+                            <span className="text-navy font-black text-sm lg:text-lg">{selectedProject.location}</span>
                          </div>
                          <div className="flex flex-col">
                             <span className="text-[0.55rem] font-bold text-mid uppercase tracking-[3px] mb-2">Stakeholder</span>
-                            <span className="text-blue font-black text-sm lg:text-lg">{selectedProject.client}</span>
+                            <span className="text-navy font-black text-sm lg:text-lg">{selectedProject.client}</span>
                          </div>
                          <div className="flex flex-col">
                             <span className="text-[0.55rem] font-bold text-mid uppercase tracking-[3px] mb-2">Completion</span>
-                            <span className="text-blue font-black text-sm lg:text-lg">{selectedProject.year}</span>
+                            <span className="text-navy font-black text-sm lg:text-lg">{selectedProject.year}</span>
                          </div>
                       </div>
                    </div>

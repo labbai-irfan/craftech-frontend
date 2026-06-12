@@ -59,7 +59,7 @@ const CustomCursor = () => {
         className={`fixed left-0 top-0 z-[10000] -ml-[20px] -mt-[20px] h-[40px] w-[40px] rounded-full pointer-events-none hidden lg:block transition-colors duration-300 ${
           cursorType === "hover"
             ? "border border-accent"
-            : "border border-blue/50"
+            : "border border-navy/50"
         }`}
       />
 

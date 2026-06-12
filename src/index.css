@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/animations.css';
+
+@layer components {
+  .btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn bg-navy text-white hover:bg-navy-light; }
+  .btn-accent { @apply btn bg-accent text-white hover:bg-red-700; }
+  .btn-ghost { @apply btn bg-transparent text-gray-300 hover:bg-surface-2; }
+  .btn-danger { @apply btn bg-red-900/30 text-red-400 hover:bg-red-900/60 border border-red-800; }
+
+  .input { @apply w-full px-3 py-2 bg-surface-2 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-500 text-sm focus:outline-none focus:border-navy-light focus:ring-1 focus:ring-navy-light transition-colors; }
+  .label { @apply block text-sm font-medium text-gray-300 mb-1.5; }
+
+  .card { @apply bg-surface-2 rounded-xl border border-gray-700/50; }
+  .card-header { @apply px-6 py-4 border-b border-gray-700/50; }
+  .card-body { @apply p-6; }
+
+  .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium; }
+  .badge-blue { @apply badge bg-blue-900/40 text-blue-300; }
+  .badge-red { @apply badge bg-red-900/40 text-red-300; }
+  .badge-green { @apply badge bg-green-900/40 text-green-300; }
+  .badge-gold { @apply badge bg-yellow-900/40 text-yellow-300; }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -10,6 +33,9 @@
   body {
     @apply font-poppins text-dark bg-white overflow-x-hidden;
     line-height: 1.7;
+  }
+  /* Public pages only: hide cursor for custom cursor effect */
+  body.cursor-hidden {
     cursor: none;
   }
 }
@@ -73,4 +99,116 @@
 /* Hide cursor on mobile */
 @media (max-width: 1024px) {
   body { cursor: auto; }
+}
+
+/* ── Admin Design System ─────────────────────────────────────────────── */
+
+/* Admin page background */
+.admin-bg {
+  background: linear-gradient(180deg, #040e1f 0%, #050f21 100%);
+}
+
+/* Admin card glass */
+.admin-card {
+  background: rgba(10, 38, 71, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+}
+
+/* Admin input */
+.admin-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(10, 38, 71, 0.3);
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: 'Poppins', sans-serif;
+}
+.admin-input:focus {
+  border-color: rgba(196, 27, 31, 0.5);
+}
+.admin-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.admin-input option {
+  background: #061b36;
+}
+
+/* Scrollbar for admin sidebar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Admin section label */
+.admin-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 8px;
+}
+
+/* Admin overlay scrollbar for main content */
+main::-webkit-scrollbar {
+  width: 6px;
+}
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+main::-webkit-scrollbar-thumb:hover {
+  background: rgba(196, 27, 31, 0.3);
+}
+
+/* CMS form cards consistent with admin theme */
+.cms-card {
+  background: rgba(10, 38, 71, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.cms-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cms-card-body {
+  padding: 20px;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pulse animation for status indicators */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-subtle-pulse {
+  animation: subtlePulse 2s ease-in-out infinite;
 }

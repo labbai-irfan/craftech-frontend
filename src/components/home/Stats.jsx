@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useCMS } from '../../context/CMSContext';
 
-const statsData = [
+const DEFAULT_STATS = [
   { target: 25, label: 'Projects Executed' },
   { target: 18, label: 'Completed Deliveries' },
   { target: 10, label: 'Bespoke Clients' },
@@ -9,15 +9,28 @@ const statsData = [
 ];
 
 const Stats = () => {
-  const [counts, setCounts] = useState(statsData.map(() => 0));
+  const { homeData } = useCMS();
+  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [counts, setCounts] = useState(DEFAULT_STATS.map(() => 0));
   const sectionRef = useRef(null);
   const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (homeData?.stats?.length > 0) {
+      const mapped = homeData.stats.map(s => ({
+        target: parseInt(s.value) || 0,
+        label: s.label
+      }));
+      setStats(mapped);
+      setCounts(mapped.map(() => 0));
+    }
+  }, [homeData]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !started) {
         setStarted(true);
-        statsData.forEach((stat, i) => {
+        stats.forEach((stat, i) => {
           let start = 0;
           const end = stat.target;
           const duration = 2000;
@@ -36,7 +49,7 @@ const Stats = () => {
     }, { threshold: 0.2 });
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
-  }, [started]);
+  }, [started, stats]);
 
   return (
     <section id="stats" ref={sectionRef} className="bg-white py-24 relative">
@@ -47,9 +60,9 @@ const Stats = () => {
 
       <div className="container mx-auto px-8 relative z-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20">
-          {statsData.map((stat, i) => (
+          {stats.map((stat, i) => (
             <div key={i} className="text-center group" data-aos="fade-up" data-aos-delay={i * 100}>
-              <div className="text-[clamp(3.5rem,6vw,5.5rem)] font-black text-blue leading-none mb-3 flex items-baseline justify-center group-hover:scale-110 transition-transform duration-500">
+              <div className="text-[clamp(3.5rem,6vw,5.5rem)] font-black text-navy leading-none mb-3 flex items-baseline justify-center group-hover:scale-110 transition-transform duration-500">
                 <span className="tabular-nums">{counts[i]}</span>
                 <span className="text-accent text-[0.45em] font-bold">+</span>
               </div>

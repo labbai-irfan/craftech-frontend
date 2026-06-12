@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { cmsApi } from '../../services/api';
 
 const ClientsMarquee = () => {
-  const clients = [
+  const [clients, setClients] = useState([]);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const { data } = await cmsApi.getClients();
+        if (data.success) setClients(data.data);
+      } catch (err) {
+        console.error('Error fetching clients:', err);
+      }
+    };
+    fetchClients();
+  }, []);
+
+  // Fallback if no clients are added yet
+  const defaultClients = [
     { icon: 'fa-building', name: 'DB Bhavan' },
     { icon: 'fa-tower-observation', name: 'Bliss Tower' },
     { icon: 'fa-house', name: 'Juhu Bungalow' },
     { icon: 'fa-stethoscope', name: 'Dr. Waqar Ansari' },
-    { icon: 'fa-person-digging', name: 'Ramzan Shaikh' },
-    { icon: 'fa-drafting-compass', name: 'ARC Associates' },
   ];
+
+  const displayClients = clients.length > 0 ? clients : defaultClients;
 
   return (
     <section id="clients" className="py-20 bg-white border-y border-gray-100 overflow-hidden relative">
@@ -21,12 +37,18 @@ const ClientsMarquee = () => {
 
       <div className="relative flex overflow-x-hidden group">
         <div className="animate-marquee flex items-center whitespace-nowrap py-10">
-          {[...clients, ...clients, ...clients, ...clients].map((client, i) => (
+          {[...displayClients, ...displayClients, ...displayClients, ...displayClients].map((client, i) => (
             <div key={i} className="mx-16 flex items-center gap-6 group/item cursor-none">
-              <div className="w-14 h-14 bg-light rounded-full flex items-center justify-center text-blue/30 group-hover/item:text-blue group-hover/item:bg-blue/5 transition-all duration-500">
-                <i className={`fa-solid ${client.icon} text-2xl`} />
+              <div className="w-14 h-14 bg-light rounded-full flex items-center justify-center text-navy/30 group-hover/item:text-navy group-hover/item:bg-navy/5 transition-all duration-500">
+                {client.logo ? (
+                  <img src={client.logo} alt={client.name} className="w-8 h-8 object-contain filter grayscale group-hover/item:grayscale-0 transition-all" />
+                ) : (
+                  <i className={`fa-solid ${client.icon || 'fa-building'} text-2xl`} />
+                )}
               </div>
-              <span className="text-[1.8rem] font-extrabold text-blue/10 group-hover/item:text-blue transition-all duration-700 uppercase tracking-tighter select-none">{client.name}</span>
+              <span className="text-[1.8rem] font-extrabold text-navy/10 group-hover/item:text-navy transition-all duration-700 uppercase tracking-tighter select-none">
+                {client.name}
+              </span>
             </div>
           ))}
         </div>

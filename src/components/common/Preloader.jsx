@@ -26,13 +26,13 @@ const Preloader = ({ onFinish }) => {
         initial={{ y: 0 }}
         animate={isLoaded ? { y: '-100%' } : { y: 0 }}
         transition={{ duration: 0.9, ease: [0.85, 0, 0.15, 1] }}
-        className="absolute top-0 left-0 w-full h-1/2 bg-blue-dark z-[1]"
+        className="absolute top-0 left-0 w-full h-1/2 bg-navy-dark z-[1]"
       />
       <motion.div
         initial={{ y: 0 }}
         animate={isLoaded ? { y: '100%' } : { y: 0 }}
         transition={{ duration: 0.9, ease: [0.85, 0, 0.15, 1] }}
-        className="absolute bottom-0 left-0 w-full h-1/2 bg-blue-dark z-[1]"
+        className="absolute bottom-0 left-0 w-full h-1/2 bg-navy-dark z-[1]"
       />
 
       {/* Center Content */}
@@ -67,7 +67,7 @@ const Preloader = ({ onFinish }) => {
               initial={{ width: 0 }}
               animate={{ width: '100%' }}
               transition={{ duration: 1.8, ease: [0.4, 0, 0.2, 1] }}
-              className="h-full bg-gradient-to-r from-blue-light via-accent to-blue-light"
+              className="h-full bg-gradient-to-r from-navy-light via-accent to-navy-light"
             />
           </div>
         </div>
